@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Static Subtitle Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="CSInterface.js"></script>
+</head>
+<body>
+    <div class="container">
+        <img src="image.png" alt="Logo" class="logo logo-left">
+        <img src="image copy.png" alt="Logo" class="logo logo-right">
+        <h2> Captions Tool</h2>
+        
+        <!-- Feature 1: Static Subtitles -->
+        <div class="feature-panel" id="staticModeControls">
+            <div class="file-section">
+                <div class="file-group">
+                    <button id="setText">Select Text File</button>
+                    <span id="textFileStatus" class="file-status">No file selected</span>
+                </div>
+            </div>
+            <div class="text-section">
+                <label for="subtitleText">Current Text:</label>
+                <textarea id="subtitleText" rows="3" placeholder="Text will appear here after file selection"></textarea>
+            </div>
+            <div class="button-section">
+                <button id="startText">Mark Start</button>
+                <button id="endText">Mark End</button>
+            </div>
+            <div class="caption-actions">
+                <h5>Caption Actions</h5>
+                <button id="addCaptionsNow" class="primary-btn">Add Completed Captions to Track</button>
+                <p>Use this button to add all completed (marked) subtitles to the caption track at any time during your session. You can mark more subtitles and add them again.</p>
+            </div>
+            <div class="common-actions">
+                <button id="reset">Reset Subtitles</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>
