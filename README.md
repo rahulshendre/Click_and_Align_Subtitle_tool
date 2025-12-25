@@ -189,11 +189,12 @@ The `main.js` file handles:
 
 ## License
 
-[Add your license information here]
+This project is open source and available under the MIT License.
 
 ## Support
 
-[Add support contact information here]
+For support, questions, or feedback, please contact:
+- **Email**: rahulshendre789@gmail.com
 
 ## Version History
 
