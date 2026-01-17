@@ -6,6 +6,9 @@ A Premiere Pro extension for creating and aligning static subtitles with an intu
 
 This extension simplifies the process of adding subtitles to your Premiere Pro projects. Load your subtitle text file, mark start and end times by clicking buttons while playing your video, and automatically generate caption tracks in Premiere Pro.
 
+
+[![Click and Align Subtitle Tool Demo](https://img.youtube.com/vi/HWKLLsV6Un4/0.jpg)](https://youtu.be/HWKLLsV6Un4)
+
 ## Features
 
 - **Load Text Files**: Support for both `.txt` and `.srt` file formats
