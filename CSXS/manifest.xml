@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest Version="7.0"
-  ExtensionBundleId="com.subtitle.tool"
+  ExtensionBundleId="com.planetread.clickandalign.subtitle"
   ExtensionBundleVersion="1.0.0"
   ExtensionBundleName="Click and Align Subtitle Tool">
 
   <ExtensionList>
-    <Extension Id="com.subtitle.tool.panel" Version="1.0.0"/>
+    <Extension Id="com.planetread.clickandalign.subtitle.panel" Version="1.0.0"/>
   </ExtensionList>
 
   <ExecutionEnvironment>
@@ -20,7 +20,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.subtitle.tool.panel">
+    <Extension Id="com.planetread.clickandalign.subtitle.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>

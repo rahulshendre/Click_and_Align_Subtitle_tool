@@ -209,12 +209,76 @@ window.setTextBox = function(text) {
     document.getElementById("subtitleText").value = text;
 };
 
+// Tool status monitoring
+var toolStatusInterval = null;
+var isToolActive = false;
+var hasWindowFocus = true;
+
+// Track window focus - when timeline is focused, extension panel loses focus
+window.addEventListener('blur', function() {
+    hasWindowFocus = false;
+    updateToolStatus(false);
+});
+
+window.addEventListener('focus', function() {
+    hasWindowFocus = true;
+    checkToolStatus(); // Re-check status when panel regains focus
+});
+
+// Track panel visibility - re-check when panel becomes visible/hidden
+document.addEventListener('visibilitychange', function() {
+    checkToolStatus(); // Re-check status when visibility changes
+});
+
+function checkToolStatus() {
+    if (!csInterface || typeof csInterface.evalScript !== 'function') {
+        updateToolStatus(false);
+        return;
+    }
+    
+    // Check panel visibility
+    var isPanelVisible = document.visibilityState === 'visible';
+    
+    // Check both sequence availability AND window focus AND panel visibility
+    safeEvalScript("app.project && app.project.activeSequence ? 'active' : 'inactive'", function(result) {
+        // Handle script execution failures
+        if (result === null || result === undefined) {
+            updateToolStatus(false);
+            return;
+        }
+        
+        var hasSequence = result === 'active';
+        var active = hasSequence && hasWindowFocus && isPanelVisible;
+        updateToolStatus(active);
+    });
+}
+
+function updateToolStatus(active) {
+    var container = document.querySelector('.container');
+    if (!container) return;
+    
+    if (active !== isToolActive) {
+        isToolActive = active;
+        if (active) {
+            container.classList.remove('tool-inactive');
+            container.classList.add('tool-active');
+        } else {
+            container.classList.remove('tool-active');
+            container.classList.add('tool-inactive');
+        }
+    }
+}
+
 // Initialize the UI on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing UI...");
     
     // Load static script on initialization
     loadStaticScript();
+    
+    // Start status monitoring
+    checkToolStatus();
+    toolStatusInterval = setInterval(checkToolStatus, 1000); // Check every second
     
     console.log("UI initialization complete");
 });
