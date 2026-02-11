@@ -24,6 +24,19 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     border: 1px solid #2d3748;
     position: relative; /* Needed for absolute positioning of logos */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+/* Tool status indicators */
+.container.tool-active {
+    border: 3px solid #4caf50; /* Green for active */
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+}
+
+.container.tool-inactive {
+    border: 3px solid #f44336; /* Red for inactive */
+    box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+    opacity: 0.85;
 }
 
 /* Logo styles for far left and right */
