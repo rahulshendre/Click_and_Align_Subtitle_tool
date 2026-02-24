@@ -255,6 +255,13 @@ h5 {
     margin-top: 8px;
 }
 
+.encoding-hint {
+    font-size: 11px;
+    color: #7a8594;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
 .file-status.file-selected {
     color: #9be7c4;
     font-weight: 500;

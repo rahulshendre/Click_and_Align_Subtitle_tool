@@ -18,37 +18,186 @@ function logEvent(msg) {
     }
 }
 
-// Read text with UTF-16 first, fallback to UTF-8
+// =============================
+// UTF-8 decoder (works for all languages; avoids host encoding issues)
+// =============================
+
+/**
+ * Read file as raw bytes. In BINARY mode, each character's charCodeAt(i) is 0-255.
+ * @param {File} file - Openable File object
+ * @return {string|null} - Byte string or null on failure
+ */
+function readFileAsBinary(file) {
+    var out = null;
+    try {
+        file.encoding = 'BINARY';
+        if (file.open('r')) {
+            out = file.read();
+            file.close();
+        }
+    } catch (e) {
+        logEvent('Binary read failed: ' + e);
+        try { if (file && file.close) file.close(); } catch (_) {}
+    }
+    return out;
+}
+
+/**
+ * Decode UTF-8 byte string to Unicode string. Handles BOM, multi-byte sequences,
+ * and surrogate pairs for code points > 0xFFFF. Invalid sequences replaced with U+FFFD.
+ * Supports all languages (Indic, Arabic, CJK, etc.).
+ * @param {string} byteString - String where each charCodeAt(i) is a byte (0-255)
+ * @return {string} - Decoded Unicode string
+ */
+function decodeUTF8(byteString) {
+    if (!byteString || byteString.length === 0) return '';
+    var len = byteString.length;
+    var result = [];
+    var i = 0;
+    var REPLACEMENT = '\uFFFD';
+
+    // Strip UTF-8 BOM if present
+    if (len >= 3 && (byteString.charCodeAt(0) & 0xFF) === 0xEF &&
+        (byteString.charCodeAt(1) & 0xFF) === 0xBB && (byteString.charCodeAt(2) & 0xFF) === 0xBF) {
+        i = 3;
+    }
+
+    while (i < len) {
+        var b0 = byteString.charCodeAt(i) & 0xFF;
+        i += 1;
+
+        if (b0 < 0x80) {
+            result.push(String.fromCharCode(b0));
+            continue;
+        }
+        if (b0 < 0xC2) {
+            result.push(REPLACEMENT);
+            continue;
+        }
+        if (b0 <= 0xDF) {
+            if (i >= len) { result.push(REPLACEMENT); break; }
+            var b1 = byteString.charCodeAt(i) & 0xFF;
+            i += 1;
+            if ((b1 & 0xC0) !== 0x80) { result.push(REPLACEMENT); continue; }
+            var cp = ((b0 & 0x1F) << 6) | (b1 & 0x3F);
+            result.push(String.fromCharCode(cp));
+            continue;
+        }
+        if (b0 <= 0xEF) {
+            if (i + 1 >= len) { result.push(REPLACEMENT); break; }
+            var b1 = byteString.charCodeAt(i) & 0xFF;
+            var b2 = byteString.charCodeAt(i + 1) & 0xFF;
+            i += 2;
+            if ((b1 & 0xC0) !== 0x80 || (b2 & 0xC0) !== 0x80) { result.push(REPLACEMENT); continue; }
+            var cp = ((b0 & 0x0F) << 12) | ((b1 & 0x3F) << 6) | (b2 & 0x3F);
+            if (cp < 0x800) { result.push(REPLACEMENT); continue; }
+            if (cp >= 0xD800 && cp <= 0xDFFF) { result.push(REPLACEMENT); continue; }
+            result.push(String.fromCharCode(cp));
+            continue;
+        }
+        if (b0 <= 0xF4) {
+            if (i + 2 >= len) { result.push(REPLACEMENT); break; }
+            var b1 = byteString.charCodeAt(i) & 0xFF;
+            var b2 = byteString.charCodeAt(i + 1) & 0xFF;
+            var b3 = byteString.charCodeAt(i + 2) & 0xFF;
+            i += 3;
+            if ((b1 & 0xC0) !== 0x80 || (b2 & 0xC0) !== 0x80 || (b3 & 0xC0) !== 0x80) {
+                result.push(REPLACEMENT);
+                continue;
+            }
+            var cp = ((b0 & 0x07) << 18) | ((b1 & 0x3F) << 12) | ((b2 & 0x3F) << 6) | (b3 & 0x3F);
+            if (cp < 0x10000 || cp > 0x10FFFF) { result.push(REPLACEMENT); continue; }
+            cp -= 0x10000;
+            result.push(String.fromCharCode(0xD800 + (cp >> 10), 0xDC00 + (cp & 0x3FF)));
+            continue;
+        }
+        result.push(REPLACEMENT);
+    }
+    return result.join('');
+}
+
+// --- UTF-16 support (commented out; tool uses UTF-8 only) ---
+// Decode UTF-16 LE from raw bytes (no re-open, no host encoding). BOM (FF FE) skipped. Handles surrogate pairs.
+/*
+function decodeUTF16LE(byteString) {
+    if (!byteString || byteString.length < 2) return '';
+    var len = byteString.length;
+    var result = [];
+    var i = 2; // skip BOM (FF FE)
+    var REPLACEMENT = '\uFFFD';
+    while (i + 1 < len) {
+        var lo = byteString.charCodeAt(i) & 0xFF;
+        var hi = byteString.charCodeAt(i + 1) & 0xFF;
+        var codeUnit = lo | (hi << 8);
+        i += 2;
+        if (codeUnit >= 0xD800 && codeUnit <= 0xDBFF && i + 1 < len) {
+            var lo2 = byteString.charCodeAt(i) & 0xFF;
+            var hi2 = byteString.charCodeAt(i + 1) & 0xFF;
+            var low = lo2 | (hi2 << 8);
+            if (low >= 0xDC00 && low <= 0xDFFF) {
+                i += 2;
+                result.push(String.fromCharCode(codeUnit, low));
+            } else result.push(REPLACEMENT);
+        } else if (codeUnit >= 0xDC00 && codeUnit <= 0xDFFF) result.push(REPLACEMENT);
+        else result.push(String.fromCharCode(codeUnit));
+    }
+    return result.join('');
+}
+
+// Decode UTF-16 BE from raw bytes. BOM (FE FF) skipped. Handles surrogate pairs.
+function decodeUTF16BE(byteString) {
+    if (!byteString || byteString.length < 2) return '';
+    var len = byteString.length;
+    var result = [];
+    var i = 2;
+    var REPLACEMENT = '\uFFFD';
+    while (i + 1 < len) {
+        var hi = byteString.charCodeAt(i) & 0xFF;
+        var lo = byteString.charCodeAt(i + 1) & 0xFF;
+        var codeUnit = (hi << 8) | lo;
+        i += 2;
+        if (codeUnit >= 0xD800 && codeUnit <= 0xDBFF && i + 1 < len) {
+            var hi2 = byteString.charCodeAt(i) & 0xFF;
+            var lo2 = byteString.charCodeAt(i + 1) & 0xFF;
+            var low = (hi2 << 8) | lo2;
+            if (low >= 0xDC00 && low <= 0xDFFF) {
+                i += 2;
+                result.push(String.fromCharCode(codeUnit, low));
+            } else result.push(REPLACEMENT);
+        } else if (codeUnit >= 0xDC00 && codeUnit <= 0xDFFF) result.push(REPLACEMENT);
+        else result.push(String.fromCharCode(codeUnit));
+    }
+    return result.join('');
+}
+*/
+
+// Read text: UTF-8 only (decode from binary). UTF-16 path commented out.
 function readTextFileTolerant(file) {
-    var content = null;
-    try {
-        file.encoding = 'UTF-16';
-        if (file.open('r')) {
-            content = file.read();
-            file.close();
-            if (content && content.length > 0) {
-                logEvent('Read text as UTF-16 successfully');
-                return content;
-            }
-        }
-    } catch (e1) {
-        logEvent('UTF-16 read failed: ' + e1);
-        try { if (file && file.close) file.close(); } catch (_) {}
+    // 1) Read entire file as binary
+    var rawBytes = readFileAsBinary(file);
+    if (!rawBytes || rawBytes.length === 0) return null;
+
+    // 2) UTF-16 LE/BE disabled — treat all as UTF-8 (with or without BOM)
+    // if (rawBytes.length >= 2) {
+    //     var b0 = rawBytes.charCodeAt(0) & 0xFF;
+    //     var b1 = rawBytes.charCodeAt(1) & 0xFF;
+    //     if (b0 === 0xFF && b1 === 0xFE) {
+    //         var content = decodeUTF16LE(rawBytes);
+    //         if (content && content.length > 0) { logEvent('Read text as UTF-16 LE (decoded) successfully'); return content; }
+    //     }
+    //     if (b0 === 0xFE && b1 === 0xFF) {
+    //         var content = decodeUTF16BE(rawBytes);
+    //         if (content && content.length > 0) { logEvent('Read text as UTF-16 BE (decoded) successfully'); return content; }
+    //     }
+    // }
+
+    // 3) Decode as UTF-8 (all languages supported)
+    var content = decodeUTF8(rawBytes);
+    if (content && content.length > 0) {
+        logEvent('Read text as UTF-8 (decoded) successfully');
+        return content;
     }
-    try {
-        file.encoding = 'UTF-8';
-        if (file.open('r')) {
-            content = file.read();
-            file.close();
-            if (content && content.length > 0) {
-                logEvent('Read text as UTF-8 successfully');
-                return content;
-            }
-        }
-    } catch (e2) {
-        logEvent('UTF-8 read failed: ' + e2);
-        try { if (file && file.close) file.close(); } catch (_) {}
-    }
+
     return null;
 }
 
@@ -141,10 +290,10 @@ function main() {
         }
         subtitleLines = subs;
     } else {
-        // TXT tolerant read (UTF-16 first, fallback UTF-8), normalize
+        // TXT tolerant read (UTF-8), normalize
         var raw = readTextFileTolerant(file);
         if (!raw) {
-            alert('Failed to read text file. Save as UTF-16 LE or UTF-8 and try again.');
+            alert('Failed to read text file. Please save your file as UTF-8 (works for all languages).');
             return;
         }
         var lines = normalizeAndFilterLines(raw);
