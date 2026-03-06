@@ -83,6 +83,73 @@ function loadStaticScript() {
     }
 }
 
+// =============================
+// Word spacing controls (UI + host sync)
+// =============================
+
+var wordSpacingSlider = document.getElementById('wordSpacingSlider');
+var wordSpacingInput = document.getElementById('wordSpacing');
+var wordSpacingUp = document.getElementById('wordSpacingUp');
+var wordSpacingDown = document.getElementById('wordSpacingDown');
+
+function normalizeWordSpacing(value) {
+    var spacing = parseFloat(value);
+    if (isNaN(spacing) || spacing < 1) {
+        spacing = 1;
+    }
+    if (spacing > 15) {
+        spacing = 15;
+    }
+    return spacing;
+}
+
+function updateWordSpacing(spacing) {
+    var normalized = normalizeWordSpacing(spacing);
+
+    if (wordSpacingInput) {
+        wordSpacingInput.value = normalized.toFixed(1);
+    }
+    if (wordSpacingSlider) {
+        wordSpacingSlider.value = normalized;
+    }
+
+    // Ensure JSX is loaded, then update spacing in host
+    loadStaticScript();
+    if (typeof csInterface !== 'undefined' && csInterface && csInterface.evalScript) {
+        csInterface.evalScript("setWordSpacing(" + normalized + ")");
+    }
+}
+
+if (wordSpacingSlider && wordSpacingInput) {
+    wordSpacingSlider.oninput = function() {
+        updateWordSpacing(wordSpacingSlider.value);
+    };
+    
+    wordSpacingInput.oninput = function() {
+        updateWordSpacing(wordSpacingInput.value);
+    };
+}
+
+if (wordSpacingUp && wordSpacingInput) {
+    wordSpacingUp.onclick = function() {
+        var currentValue = parseFloat(wordSpacingInput.value) || 1;
+        var step = parseFloat(wordSpacingInput.step) || 0.1;
+        var max = parseFloat(wordSpacingInput.max) || 15;
+        var newValue = Math.min(currentValue + step, max);
+        updateWordSpacing(newValue);
+    };
+}
+
+if (wordSpacingDown && wordSpacingInput) {
+    wordSpacingDown.onclick = function() {
+        var currentValue = parseFloat(wordSpacingInput.value) || 1;
+        var step = parseFloat(wordSpacingInput.step) || 0.1;
+        var min = parseFloat(wordSpacingInput.min) || 0;
+        var newValue = Math.max(currentValue - step, min);
+        updateWordSpacing(newValue);
+    };
+}
+
 // Set Text button event listener (Feature 1)
 var setTextElement = document.getElementById("setText");
 if (setTextElement) {
@@ -108,7 +175,7 @@ if (setTextElement) {
                             textFileStatusElement.textContent = fileName;
                             textFileStatusElement.classList.add("file-selected");
                         } else {
-                            textFileStatusElement.textContent = "No file selected";
+                            textFileStatusElement.textContent = "No file chosen";
                             textFileStatusElement.classList.remove("file-selected");
                         }
                     }
@@ -163,6 +230,10 @@ if (addCaptionsNowElement) {
     addCaptionsNowElement.addEventListener("click", function () {
         console.log("addCaptionsNow button clicked");
         loadStaticScript();
+        // Ensure latest word spacing is synced before exporting captions
+        if (wordSpacingInput) {
+            updateWordSpacing(wordSpacingInput.value);
+        }
         if (typeof csInterface !== 'undefined' && csInterface.evalScript) {
             csInterface.evalScript("addCaptionsNow()", function (result) {
                 console.log("addCaptionsNow result: " + result);
@@ -184,7 +255,7 @@ if (resetElement) {
         // Reset file status
         var textFileStatusElement = document.getElementById("textFileStatus");
         if (textFileStatusElement) {
-            textFileStatusElement.textContent = "No file selected";
+            textFileStatusElement.textContent = "No file chosen";
             textFileStatusElement.classList.remove("file-selected");
         }
         
@@ -275,6 +346,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load static script on initialization
     loadStaticScript();
+    
+    // Initialize default word spacing in host
+    if (wordSpacingInput) {
+        updateWordSpacing(wordSpacingInput.value);
+    }
     
     // Start status monitoring
     checkToolStatus();

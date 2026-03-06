@@ -2,6 +2,7 @@ var subtitleLines = [];
 var currentIndex = 0;
 var subtitleMode = 'static';
 var currentFileName = null; // Store current file name 
+var wordSpacingSetting = 1; // Default word spacing
 
 // =============================
 // Utilities (encoding, logging)
@@ -40,6 +41,28 @@ function readFileAsBinary(file) {
         try { if (file && file.close) file.close(); } catch (_) {}
     }
     return out;
+}
+
+// Apply decimal word spacing (borrowed from SlideAndAlignSubtitleTool)
+function applyWordSpacing(line, spacing) {
+    var intSpaces = Math.floor(spacing);
+    var extra = spacing - intSpaces;
+    var spaceStr = Array(intSpaces + 1).join(' ');
+    // Scale fractional part: ~5 thin spaces (U+2009) ≈ 1 normal space
+    var thinCount = extra > 0 ? Math.max(1, Math.round(extra * 5)) : 0;
+    var thinSpace = thinCount > 0 ? Array(thinCount + 1).join(String.fromCharCode(0x2009)) : '';
+    return line.replace(/ +/g, spaceStr + thinSpace);
+}
+
+function setWordSpacing(value) {
+    var spacing = parseFloat(value);
+    if (isNaN(spacing) || spacing < 1) {
+        spacing = 1;
+    }
+    if (spacing > 15) {
+        spacing = 15;
+    }
+    wordSpacingSetting = spacing;
 }
 
 /**
@@ -458,6 +481,7 @@ function resetSubtitles() {
     subtitleLines = [];
     currentIndex = 0;
     currentFileName = null; // Reset file name
+    wordSpacingSetting = 1;
     
     if (app.project && app.project.activeSequence && app.project.activeSequence.markers) {
         var markers = app.project.activeSequence.markers;
@@ -515,6 +539,13 @@ function autoCreateCaptionTrackFromSubtitles() {
             alert("No subtitles to export as captions.");
             return;
         }
+        var spacing = wordSpacingSetting;
+        if (isNaN(spacing) || spacing < 1) {
+            spacing = 1;
+        }
+        if (spacing > 15) {
+            spacing = 15;
+        }
         var srt = "";
         var idx = 1;
         for (var i = 0; i < subtitleLines.length; i++) {
@@ -522,7 +553,8 @@ function autoCreateCaptionTrackFromSubtitles() {
             if (!line.start || !line.end) continue;
             srt += idx + "\n";
             srt += formatTime(line.start) + " --> " + formatTime(line.end) + "\n";
-            srt += line.text + "\n\n";
+            var spacedText = applyWordSpacing(line.text, spacing);
+            srt += spacedText + "\n\n";
             idx++;
         }
         

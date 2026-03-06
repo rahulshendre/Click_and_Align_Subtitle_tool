@@ -19,14 +19,39 @@
         <div class="feature-panel" id="staticModeControls">
             <div class="file-section">
                 <div class="file-group">
-                    <button id="setText">Select Text File</button>
-                    <span id="textFileStatus" class="file-status">No file selected</span>
-                    <p class="encoding-hint">Use UTF-8 encoding for your text file (works for all languages). Save your file as UTF-8.</p>
+                    <div class="input-group">
+                        <label for="setText">Subtitle file (.txt or .srt):
+                            <span class="info">&#9432;
+                                <span class="tooltip">Use UTF-8 encoding for your text file (works for all languages). Save your file as UTF-8.</span>
+                            </span>
+                        </label>
+                        <div class="custom-file-input-wrapper">
+                            <button type="button" id="setText">Select Text File</button>
+                            <span id="textFileStatus" class="file-status">No file chosen</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="text-section">
                 <label for="subtitleText">Current Text:</label>
                 <textarea id="subtitleText" rows="3" placeholder="Text will appear here after file selection"></textarea>
+            </div>
+            <div class="input-group" id="wordSpacingGroup">
+                <label for="wordSpacing">Word Spacing:
+                    <span class="info">&#9432;
+                        <span class="tooltip">Adjust the space between words. 1.0 = normal. Range: 0 to 15.</span>
+                    </span>
+                </label>
+                <div class="slider-row">
+                    <input type="range" id="wordSpacingSlider" min="0" max="15" value="1.0" step="0.1">
+                    <div class="number-input-wrapper">
+                        <input type="number" id="wordSpacing" min="0" max="15" value="1.0" step="0.1">
+                        <div class="arrow-buttons">
+                            <button type="button" class="arrow-btn up" id="wordSpacingUp">▲</button>
+                            <button type="button" class="arrow-btn down" id="wordSpacingDown">▼</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="button-section">
                 <button id="startText">Mark Start</button>
