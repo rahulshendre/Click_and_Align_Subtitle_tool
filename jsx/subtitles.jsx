@@ -194,33 +194,37 @@ function decodeUTF16BE(byteString) {
 }
 */
 
-// Read text: UTF-8 only (decode from binary). UTF-16 path commented out.
+// Read text: try UTF-8 first, then UTF-16 (host decoding; avoids mojibake)
 function readTextFileTolerant(file) {
-    // 1) Read entire file as binary
-    var rawBytes = readFileAsBinary(file);
-    if (!rawBytes || rawBytes.length === 0) return null;
-
-    // 2) UTF-16 LE/BE disabled — treat all as UTF-8 (with or without BOM)
-    // if (rawBytes.length >= 2) {
-    //     var b0 = rawBytes.charCodeAt(0) & 0xFF;
-    //     var b1 = rawBytes.charCodeAt(1) & 0xFF;
-    //     if (b0 === 0xFF && b1 === 0xFE) {
-    //         var content = decodeUTF16LE(rawBytes);
-    //         if (content && content.length > 0) { logEvent('Read text as UTF-16 LE (decoded) successfully'); return content; }
-    //     }
-    //     if (b0 === 0xFE && b1 === 0xFF) {
-    //         var content = decodeUTF16BE(rawBytes);
-    //         if (content && content.length > 0) { logEvent('Read text as UTF-16 BE (decoded) successfully'); return content; }
-    //     }
-    // }
-
-    // 3) Decode as UTF-8 (all languages supported)
-    var content = decodeUTF8(rawBytes);
-    if (content && content.length > 0) {
-        logEvent('Read text as UTF-8 (decoded) successfully');
-        return content;
+    var content = null;
+    try {
+        file.encoding = 'UTF-8';
+        if (file.open('r')) {
+            content = file.read();
+            file.close();
+            if (content && content.length > 0) {
+                logEvent('Read text as UTF-8 successfully');
+                return content;
+            }
+        }
+    } catch (e1) {
+        logEvent('UTF-8 read failed: ' + e1);
+        try { if (file && file.close) file.close(); } catch (_) {}
     }
-
+    try {
+        file.encoding = 'UTF-16';
+        if (file.open('r')) {
+            content = file.read();
+            file.close();
+            if (content && content.length > 0) {
+                logEvent('Read text as UTF-16 successfully');
+                return content;
+            }
+        }
+    } catch (e2) {
+        logEvent('UTF-16 read failed: ' + e2);
+        try { if (file && file.close) file.close(); } catch (_) {}
+    }
     return null;
 }
 
