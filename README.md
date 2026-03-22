@@ -6,6 +6,11 @@ A Premiere Pro extension for creating and aligning static subtitles with an intu
 
 This extension simplifies the process of adding subtitles to your Premiere Pro projects. Load your subtitle text file, mark start and end times by clicking buttons while playing your video, and automatically generate caption tracks in Premiere Pro.
 
+The plugin is live and can be accessed from [Click and Align Subtitle tool](https://exchange.adobe.com/apps/cc/204683/click-and-align-subtitle-tool)
+
+
+[![Click and Align Subtitle Tool Demo](https://img.youtube.com/vi/HWKLLsV6Un4/0.jpg)](https://youtu.be/HWKLLsV6Un4)
+
 ## Features
 
 - **Load Text Files**: Support for both `.txt` and `.srt` file formats
@@ -33,6 +38,7 @@ ClickAndAlignSubtitleTool/
 ├── style.css                # Styling and UI design
 ├── bird_logo.png            # Brand logo (left)
 ├── planetread_logo.png      # Brand logo (right)
+├── DEVELOPER.md             # Architecture and function reference (maintainers)
 └── README.md                # This file
 ```
 
@@ -122,7 +128,7 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 
 ### Extension Configuration
 
-- **Bundle ID**: `com.subtitle.tool`
+- **Bundle ID**: `com.planetread.clickandalign.subtitle` (see `CSXS/manifest.xml`)
 - **Version**: 1.0.0
 - **Panel Size**: 400x800 pixels
 - **Auto-Visible**: Yes
@@ -167,25 +173,9 @@ SRT files for caption import are created in the system temporary folder to avoid
 
 ## Development
 
-### ExtendScript Functions
+See **[DEVELOPER.md](DEVELOPER.md)** for architecture (CEP ↔ ExtendScript), UI-to-host call map, state and export flow, and tables of major functions in `main.js` and `jsx/subtitles.jsx`.
 
-The main ExtendScript functions available in `subtitles.jsx`:
-
-- `main()` - Load subtitle file
-- `toggleStartMark()` - Mark start time
-- `markEnd(mode)` - Mark end time
-- `addCaptionsNow()` - Export completed captions
-- `resetSubtitles()` - Reset all progress
-- `getCurrentSubtitle()` - Get current subtitle text
-- `getCurrentFileName()` - Get loaded file name
-
-### JavaScript Interface
-
-The `main.js` file handles:
-- CSInterface initialization
-- Event listeners for UI buttons
-- Communication between HTML UI and ExtendScript
-- Error handling and logging
+The `main.js` panel script handles CSInterface initialization, button and spacing event wiring, `evalScript` calls into ExtendScript, and tool active/inactive UI state.
 
 ## License
 
