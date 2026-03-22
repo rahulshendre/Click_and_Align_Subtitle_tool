@@ -38,6 +38,7 @@ ClickAndAlignSubtitleTool/
 ├── style.css                # Styling and UI design
 ├── bird_logo.png            # Brand logo (left)
 ├── planetread_logo.png      # Brand logo (right)
+├── DEVELOPER.md             # Architecture and function reference (maintainers)
 └── README.md                # This file
 ```
 
@@ -127,7 +128,7 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 
 ### Extension Configuration
 
-- **Bundle ID**: `com.subtitle.tool`
+- **Bundle ID**: `com.planetread.clickandalign.subtitle` (see `CSXS/manifest.xml`)
 - **Version**: 1.0.0
 - **Panel Size**: 400x800 pixels
 - **Auto-Visible**: Yes
@@ -172,25 +173,9 @@ SRT files for caption import are created in the system temporary folder to avoid
 
 ## Development
 
-### ExtendScript Functions
+See **[DEVELOPER.md](DEVELOPER.md)** for architecture (CEP ↔ ExtendScript), UI-to-host call map, state and export flow, and tables of major functions in `main.js` and `jsx/subtitles.jsx`.
 
-The main ExtendScript functions available in `subtitles.jsx`:
-
-- `main()` - Load subtitle file
-- `toggleStartMark()` - Mark start time
-- `markEnd(mode)` - Mark end time
-- `addCaptionsNow()` - Export completed captions
-- `resetSubtitles()` - Reset all progress
-- `getCurrentSubtitle()` - Get current subtitle text
-- `getCurrentFileName()` - Get loaded file name
-
-### JavaScript Interface
-
-The `main.js` file handles:
-- CSInterface initialization
-- Event listeners for UI buttons
-- Communication between HTML UI and ExtendScript
-- Error handling and logging
+The `main.js` panel script handles CSInterface initialization, button and spacing event wiring, `evalScript` calls into ExtendScript, and tool active/inactive UI state.
 
 ## License
 
