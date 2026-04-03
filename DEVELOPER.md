@@ -250,9 +250,9 @@ Values below come from `CSXS/manifest.xml` (prefer this over older copies in oth
 | Item | Value |
 |------|--------|
 | Bundle ID | `com.planetread.clickandalign.subtitle` |
-| Bundle version | `1.0.0` |
-| Panel extension ID | `com.planetread.clickandalign.subtitle.panel` |
-| Premiere host | `PPRO`, version range **`[25.0, 25.9]`** |
+| Bundle version | `2.0.0` |
+| Panel extension ID | `com.planetread.clickandalign.subtitle.panel` (panel `Version` **2.0.0**) |
+| Premiere host | `PPRO`, version range **`[25.0, 99.9]`** |
 | CEP runtime | CSXS **`12.0`** |
 | Panel entry | `MainPath`: `./index.html` |
 | Host script registration | `ScriptPath`: `./jsx/subtitles.jsx` (Premiere also loads definitions; the panel still calls `$.evalFile` for the same file in `loadStaticScript()` — behavior is effectively “ensure script is present.”) |

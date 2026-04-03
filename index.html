@@ -20,13 +20,13 @@
             <div class="file-section">
                 <div class="file-group">
                     <div class="input-group">
-                        <label for="setText">Subtitle file (.txt or .srt):
+                        <label for="setText">Subtitle file (.txt):
                             <span class="info">&#9432;
                                 <span class="tooltip">Use UTF-8 or UTF-16 LE for your text file (works for all languages).</span>
                             </span>
                         </label>
                         <div class="custom-file-input-wrapper">
-                            <button type="button" id="setText">Select Text File</button>
+                            <button type="button" id="setText">Load Text File</button>
                             <span id="textFileStatus" class="file-status">No file chosen</span>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
             </div>
             <div class="text-section">
                 <label for="subtitleText">Current Text:</label>
-                <textarea id="subtitleText" rows="3" placeholder="Text will appear here after file selection"></textarea>
+                <textarea id="subtitleText" rows="3" placeholder="Text will appear here after loading a file"></textarea>
             </div>
             <div class="input-group" id="wordSpacingGroup">
                 <label for="wordSpacing">Word Spacing:

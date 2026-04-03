@@ -13,7 +13,7 @@ The plugin is live and can be accessed from [Click and Align Subtitle tool](http
 
 ## Features
 
-- **Load Text Files**: Support for both `.txt` and `.srt` file formats
+- **Load Text Files**: Support for both `.txt` file formats
 - **Flexible Encoding**: Automatically handles UTF-16 and UTF-8 text file encoding
 - **Click-to-Mark Workflow**: 
   - Mark start time for each subtitle
@@ -44,7 +44,7 @@ ClickAndAlignSubtitleTool/
 
 ## Requirements
 
-- **Adobe Premiere Pro**: Version 25.0 to 25.9
+- **Adobe Premiere Pro**: 25.0 and later (CEP manifest range `[25.0, 99.9]`)
 - **CEP Runtime**: Version 12.0 or higher
 - **Operating System**: Windows or macOS
 
@@ -84,8 +84,8 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 ### Basic Workflow
 
 1. **Load Your Subtitle File**
-   - Click "Select Text File" button
-   - Choose a `.txt` or `.srt` file
+   - Click "Load Text File"
+   - Choose a `.txt` file
    - The first subtitle line will appear in the text area
 
 2. **Mark Start Time**
@@ -113,9 +113,6 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 - Supports UTF-8 and UTF-16 encoding
 - Empty lines are automatically filtered out
 
-**SRT Files (.srt):**
-- Standard SubRip subtitle format
-- If your SRT file already contains timing information, it will be loaded but you can still re-mark the times
 
 ### Tips
 
@@ -129,7 +126,7 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 ### Extension Configuration
 
 - **Bundle ID**: `com.planetread.clickandalign.subtitle` (see `CSXS/manifest.xml`)
-- **Version**: 1.0.0
+- **Version**: 2.0.0
 - **Panel Size**: 400x800 pixels
 - **Auto-Visible**: Yes
 
@@ -163,7 +160,6 @@ SRT files for caption import are created in the system temporary folder to avoid
 
 - Ensure you have an active sequence in Premiere Pro
 - Verify that at least one subtitle has both start and end times marked
-- Check that Premiere Pro supports SRT import (version 25.0+)
 
 ### Timeline Markers Not Appearing
 
@@ -188,9 +184,14 @@ For support, questions, or feedback, please contact:
 
 ## Version History
 
+### 2.0.0
+- Declared Premiere compatibility **25.0 through 99.9** in the manifest (reduce resubmits on new Premiere minors)
+- Bundle / panel version aligned to **2.0.0**
+- UI copy: load file button wording updated (**Load Text File**)
+
 ### 1.0.0
 - Initial release
 - Static subtitle marking workflow
-- Support for TXT and SRT file formats
+- Support for TXT file formats
 - Auto-caption track creation
 - Timeline marker integration
