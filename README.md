@@ -6,9 +6,14 @@ A Premiere Pro extension for creating and aligning static subtitles with an intu
 
 This extension simplifies the process of adding subtitles to your Premiere Pro projects. Load your subtitle text file, mark start and end times by clicking buttons while playing your video, and automatically generate caption tracks in Premiere Pro.
 
+The plugin is live and can be accessed from [Click and Align Subtitle tool](https://exchange.adobe.com/apps/cc/204683/click-and-align-subtitle-tool)
+
+
+[![Click and Align Subtitle Tool Demo](https://img.youtube.com/vi/HWKLLsV6Un4/0.jpg)](https://youtu.be/HWKLLsV6Un4)
+
 ## Features
 
-- **Load Text Files**: Support for both `.txt` and `.srt` file formats
+- **Load Text Files**: Support for both `.txt` file formats
 - **Flexible Encoding**: Automatically handles UTF-16 and UTF-8 text file encoding
 - **Click-to-Mark Workflow**: 
   - Mark start time for each subtitle
@@ -33,12 +38,13 @@ ClickAndAlignSubtitleTool/
 ├── style.css                # Styling and UI design
 ├── bird_logo.png            # Brand logo (left)
 ├── planetread_logo.png      # Brand logo (right)
+├── DEVELOPER.md             # Architecture and function reference (maintainers)
 └── README.md                # This file
 ```
 
 ## Requirements
 
-- **Adobe Premiere Pro**: Version 25.0 to 25.9
+- **Adobe Premiere Pro**: 25.0 through 26.x (manifest range **`[25.0, 26.9]`**; Adobe Exchange may reject the max if it exceeds their then-current PPRO ceiling)
 - **CEP Runtime**: Version 12.0 or higher
 - **Operating System**: Windows or macOS
 
@@ -78,8 +84,8 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 ### Basic Workflow
 
 1. **Load Your Subtitle File**
-   - Click "Select Text File" button
-   - Choose a `.txt` or `.srt` file
+   - Click "Load Text File"
+   - Choose a `.txt` file
    - The first subtitle line will appear in the text area
 
 2. **Mark Start Time**
@@ -107,9 +113,6 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 - Supports UTF-8 and UTF-16 encoding
 - Empty lines are automatically filtered out
 
-**SRT Files (.srt):**
-- Standard SubRip subtitle format
-- If your SRT file already contains timing information, it will be loaded but you can still re-mark the times
 
 ### Tips
 
@@ -122,8 +125,8 @@ Go to **Window > Extensions > Click and Align Subtitle Tool**
 
 ### Extension Configuration
 
-- **Bundle ID**: `com.subtitle.tool`
-- **Version**: 1.0.0
+- **Bundle ID**: `com.planetread.clickalignsubtitletool` (see `CSXS/manifest.xml`)
+- **Version**: 2.0.0
 - **Panel Size**: 400x800 pixels
 - **Auto-Visible**: Yes
 
@@ -157,7 +160,6 @@ SRT files for caption import are created in the system temporary folder to avoid
 
 - Ensure you have an active sequence in Premiere Pro
 - Verify that at least one subtitle has both start and end times marked
-- Check that Premiere Pro supports SRT import (version 25.0+)
 
 ### Timeline Markers Not Appearing
 
@@ -167,25 +169,9 @@ SRT files for caption import are created in the system temporary folder to avoid
 
 ## Development
 
-### ExtendScript Functions
+See **[DEVELOPER.md](DEVELOPER.md)** for architecture (CEP ↔ ExtendScript), UI-to-host call map, state and export flow, and tables of major functions in `main.js` and `jsx/subtitles.jsx`.
 
-The main ExtendScript functions available in `subtitles.jsx`:
-
-- `main()` - Load subtitle file
-- `toggleStartMark()` - Mark start time
-- `markEnd(mode)` - Mark end time
-- `addCaptionsNow()` - Export completed captions
-- `resetSubtitles()` - Reset all progress
-- `getCurrentSubtitle()` - Get current subtitle text
-- `getCurrentFileName()` - Get loaded file name
-
-### JavaScript Interface
-
-The `main.js` file handles:
-- CSInterface initialization
-- Event listeners for UI buttons
-- Communication between HTML UI and ExtendScript
-- Error handling and logging
+The `main.js` panel script handles CSInterface initialization, button and spacing event wiring, `evalScript` calls into ExtendScript, and tool active/inactive UI state.
 
 ## License
 
@@ -198,9 +184,14 @@ For support, questions, or feedback, please contact:
 
 ## Version History
 
+### 2.0.0
+- Manifest PPRO range **`[25.0, 26.9]`** for Premiere 25.x and 26.x (avoid placeholders like `99.9`—Exchange enforces an upper bound).
+- Bundle / panel version aligned to **2.0.0**
+- UI copy: load file button wording updated (**Load Text File**)
+
 ### 1.0.0
 - Initial release
 - Static subtitle marking workflow
-- Support for TXT and SRT file formats
+- Support for TXT file formats
 - Auto-caption track creation
 - Timeline marker integration

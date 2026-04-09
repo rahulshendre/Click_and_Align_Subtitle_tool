@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest Version="7.0"
-  ExtensionBundleId="com.planetread.clickandalign.subtitle"
-  ExtensionBundleVersion="1.0.0"
+  ExtensionBundleId="com.planetread.clickalignsubtitletool"
+  ExtensionBundleVersion="2.0.0"
   ExtensionBundleName="Click and Align Subtitle Tool">
 
   <ExtensionList>
-    <Extension Id="com.planetread.clickandalign.subtitle.panel" Version="1.0.0"/>
+    <Extension Id="com.planetread.clickalignsubtitletool.panel" Version="2.0.0"/>
   </ExtensionList>
 
   <ExecutionEnvironment>
     <HostList>
-      <Host Name="PPRO" Version="[25.0,25.9]"/>
+      <Host Name="PPRO" Version="[25.0,26.9]"/>
     </HostList>
     <LocaleList>
       <Locale Code="All"/>
@@ -20,7 +20,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.planetread.clickandalign.subtitle.panel">
+    <Extension Id="com.planetread.clickalignsubtitletool.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>
